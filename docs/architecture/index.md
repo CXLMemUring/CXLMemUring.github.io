@@ -4,21 +4,113 @@ bookCollapseSection: false
 title: "Project architecture"
 ---
 
-*Any problem in computer science can be solved with another level of indirection.  -Butler Lampson*
+<img width="601" height="171" alt="image" src="https://github.com/user-attachments/assets/48d5cf2f-df0f-4a25-8573-f1e60f05548c" />
 
-Modern AI agents have evolved from simple text generators into fully interactive agents capable of producing, executing, and code generation, consist of both LLM and controlling software. This shift enables richer, more exploratory workflows—such as forking execution paths, rolling back to previous states, and dynamically adjusting resource allocations—yet makes deployment and management challenging. Our proposed AI agent-based container framework unifies cloud and edge resources into a single, adaptive environment for stateful LLM workloads. Instead of statically choosing between local or remote infrastructures, the system dynamically configures the best combination of models, hardware, and execution strategies. This approach optimizes for latency, cost, privacy, and performance simultaneously. Key innovations include seamless state management, allowing LLM applications to fork new tasks at predefined checkpoints, roll back to earlier reasoning stages, and quickly adapt to evolving constraints. Users can start a conversation or code analysis locally for privacy and then offload to a cloud accelerator for more complex computations—automatically, without service interruption. Evaluations on use cases like software development guidance, podcast generation, and survey paper drafting show our framework reduces latency tenfold, improves cost efficiency by 1.39x, and preserves privacy. Ultimately, our solution makes LLM deployments more flexible, context-aware, and resource-efficient.
+# CXLMemUring: Breaking the Memory Wall with Hardware-Software Co-design
 
-<img width="683" alt="image" src="https://github.com/user-attachments/assets/ff94f01d-c1f0-4f7e-88ab-46dfdf35e31f" />
+## Introduction: Why Do We Need CXLMemUring?
 
-Despite their immense potential, current LLM agents face significant hurdles in deployment due to rigid hardware and infrastructure constraints shown in Figure 2. To address these limitations, our approach prioritizes three core requirements:
+We're living in the era of the Great Memory Wall. Whether you're working with HPC applications, training Deep Learning Recommendation Models (DLRM), or building Large Language Models (LLM), memory latency and bandwidth have become the critical bottlenecks limiting application scalability.
 
-1. Cascade Attention (Forking): By supporting dynamic branching of attention mechanisms, we enable flexible scaling and forking of inference pathways to tackle diverse application needs.
-2. Context Parallelism (Scheduling): Through partitioning computations into smaller contexts, workloads can be efficiently distributed across heterogeneous hosts—both within and across data centers—without compromising performance.
-3. Cyber Foraging (Edge-Cloud Collaboration): Intelligent offloading and provisioning empower agents to exploit available resources on edge devices or cloud servers, thereby reducing latency and cost.
+Enter CXL (Compute Express Link) - an emerging technology that promises to expand memory for both host CPUs and device accelerators through a load/store interface. By extending memory coherency to the PCIe root complex, CXL enables flexible co-design patterns where you can access memory with coherency using near-device compute capabilities.
 
-A key insight underlying this framework is the complete decoupling of the system state and accelerator state from the application logic, akin to “prefill decoding” techniques. Conventional application-level checkpointing and scheduling provide only partial solutions, as they lack transparency and cannot seamlessly migrate workloads to heterogeneous environments—including mobile devices. By preserving all necessary states within a self-contained environment, our containerization strategy fosters substantial innovation in areas like scheduling, resource allocation, and external function invocation.
+However, traditional memory optimization techniques like ROB, MSHR, read-ahead cache, and TLB don't scale well to CXL memory pools. This is where CXLMemUring comes in - a revolutionary hardware-software co-design paradigm for asynchronous and flexible parallel CXL memory pool access.
 
-<img width="711" alt="image" src="https://github.com/user-attachments/assets/81a664cd-b1e5-4e5c-9f56-bbcc061c8c78" />
+## The Core Concept: Memory Access Like IO_uring
 
+The name CXLMemUring draws inspiration from Linux's IO_uring mechanism. Just as IO_uring revolutionized asynchronous I/O operations, CXLMemUring aims to transform how we access memory.
 
-Moreover, our performance evaluations emphasize the handling of external function calls—a crucial feature in many AI-agent applications. By embedding tools such as code editors (e.g., Cursor, Sonnet 3.7 + Clangd) within each container, we can transparently manage both function call overhead and resource footprints. This comprehensive approach, which we refer to as “Jump your AI agent everywhere,” significantly simplifies the deployment and scaling of LLM-based applications to any computing environment.
+### How It Works
+
+1. **Offload Memory Operations**: Synthesized memory operations are offloaded to CXL endpoints, CXL switches, or cores near the CXL root complex (like Intel DSA)
+2. **Asynchronous Execution**: CPUs or accelerators can perform other computations while memory is being loaded
+3. **Smart Notification**: When CXL completes data loading, the data is placed into L1 cache (if capacity permits), and the in-core ROB is notified via a mailbox mechanism to resume computation on the previous hardware context
+
+## Technical Architecture: The Art of Hardware-Software Co-design
+
+### Software Stack
+
+CXLMemUring employs a binary JIT compiler approach, similar to Apple Rosetta:
+
+- **Forward Analysis**: Translates all remotable memory accesses and pointer accesses to CXL byte-addressable format using MLIR
+- **Backward Analysis**: Identifies all functions with remote pointers that may be rewritten with native local pointers
+- **Dynamic Optimization**: Uses profiling-guided techniques to adaptively adjust the offloading window, since access patterns often cannot be statically computed
+
+The system marks functions and labels as profiling-guided points for cost model penalties. During runtime, the JIT can modify code after labels have been called to achieve better timing windows.
+
+### Hardware Stack
+
+The hardware design consists of two main components:
+
+1. In-CPU Async Loading Engine
+
+   :
+
+   - Notifies the CPU to resume previous context when data arrives
+   - Implements callbacks through CXL.io requests with an in-core mailbox
+
+2. Near-Endpoint Coprocessor
+
+   :
+
+   - Computes load instruction sequences and simple memory operations
+   - Can be deployed near CXL Flash, GPU, or CXL switches
+   - Designed to handle the computational aspects of memory requests
+
+## Key Innovations: Beyond Traditional Approaches
+
+### 1. Fine-Grained Access Optimization
+
+Unlike RDMA's 4KB granularity, CXL supports 64-byte access granularity - much better suited for typical C++ object sizes. CXLMemUring leverages this to excel at pointer chasing and indirect memory reading scenarios.
+
+### 2. Flexible Offloading Points
+
+The system supports multiple offloading locations:
+
+- CXL endpoints
+- CXL switches
+- DSA near the root complex
+
+Each offloading point has a different cost model, allowing the system to choose the optimal approach based on the specific workload.
+
+### 3. Interrupt-Free Design
+
+Rather than using traditional interrupt-driven approaches, CXLMemUring sets ROB metadata to activate requests. This eliminates interrupt overhead and improves system efficiency.
+
+## Evaluation Framework: Proving the Value
+
+CXLMemUring is evaluated using a modified BOOMv3 implementation on FPGA, with CHI for simulating CXL switch and accelerator access. Key evaluation dimensions include:
+
+1. **Window Capture Effectiveness**: How effectively instruction windows are offloaded and how much computation can be done before memory arrives
+2. **ROB/MSHR Integration**: Optimal design patterns for integrating with existing memory subsystems
+3. **On-chip Area Comparison**: Whether this approach saves chip area
+4. **Programming Model Guidance**: Insights for future programming models
+
+## The Vision: Rethinking Memory Access
+
+CXLMemUring represents a paradigm shift in how we think about computation. In this model:
+
+- The CPU becomes a hub for combining DSA requests and executing OLAP operations
+- Control flow is offloaded while most memory remains local
+- Only minimal memory communication is required
+- Hardware design becomes more flexible, with compute capabilities deployed where needed
+
+## Implementation Insights
+
+The evaluation is based on BOOMv3 over FPGA, chosen for its modifiability. The system adds CHI for simulating CXL switches and accelerator access, plus a weaker RISC-V core near the endpoint for code offloading.
+
+For the in-core logic, all memory returns go into L1 cache to ensure they're unique to the SMT core and instantly consumed. The design avoids interrupts, instead setting ROB metadata to activate requests.
+
+## Looking Forward: The Future of Memory Access
+
+As the capacity demands with tolerable latency and bandwidth continue to grow, approaches like CXLMemUring become increasingly critical. The co-design paradigm allows us to:
+
+- Better utilize CXL's coherency capabilities
+- Overcome limitations of traditional prefetching approaches
+- Enable new programming models that better match modern workload requirements
+
+## Conclusion
+
+CXLMemUring isn't just a technical solution - it's a new way of thinking about memory access in the CXL era. By combining hardware and software innovation, we can break through the memory wall and enable the next generation of high-performance applications.
+
+As the CXL ecosystem matures, innovations like CXLMemUring will become increasingly important. They not only improve system performance but also provide developers with more flexible programming models, ultimately driving the entire computing industry forward.
