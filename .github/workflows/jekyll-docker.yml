@@ -1,0 +1,29 @@
+name: Jekyll site CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  deploy: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install dependents
+        run: |
+          pip install mkdocs-material=="9.*" mkdocs-static-i18n=="0.53"
+          pip install "mkdocs-material[imaging]"
+
+      - name: Build page
+        run: |
+          mkdocs build -v
+
+      - name: Deploy page
+        run: |
+          mkdocs gh-deploy -m "{sha}" --force --ignore-version --no-history
