@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout code
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Clean the workspace
           rm -rf * .[^.]*
@@ -22,7 +24,7 @@ jobs:
           # Initialize git if needed
           if [ ! -d .git ]; then
             git init
-            git remote add origin https://github.com/${{ github.repository }}
+            git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
           fi
           
           # Fetch the repository
