@@ -5,6 +5,10 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
+permissions:
+  contents: write
+
 jobs:
   deploy: 
     runs-on: ubuntu-latest
@@ -25,5 +29,9 @@ jobs:
           mkdocs build -v
 
       - name: Deploy page
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdocs gh-deploy -m "{sha}" --force --ignore-version --no-history
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          mkdocs gh-deploy -m "Deploy from commit ${{ github.sha }}" --force --ignore-version --no-history
