@@ -13,9 +13,24 @@ jobs:
   deploy: 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 
-      
-      - uses: actions/setup-python@v5
+      - name: Checkout code
+        shell: bash
+        run: |
+          # Clean the workspace
+          rm -rf * .[^.]*
+          
+          # Initialize git if needed
+          if [ ! -d .git ]; then
+            git init
+            git remote add origin https://github.com/${{ github.repository }}
+          fi
+          
+          # Fetch the repository
+          git fetch --depth=1 origin ${{ github.ref }}
+          
+          # Checkout the commit
+          git checkout FETCH_HEAD
+      - uses: ./.github/actions/setup-python
         with:
           python-version: 3.x
 
