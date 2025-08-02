@@ -1,0 +1,29 @@
+name: 'Custom Setup Python'
+description: 'Custom Python setup action for this repository'
+inputs:
+  python-version:
+    description: 'Python version to install'
+    required: true
+    default: '3.x'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Python
+      shell: bash
+      run: |
+        # Check if Python is already available
+        if command -v python3 &> /dev/null; then
+          echo "Python3 is already installed"
+          python3 --version
+        else
+          echo "Error: Python3 is not available in the runner"
+          exit 1
+        fi
+        
+        # Create symlink if needed
+        if ! command -v python &> /dev/null; then
+          sudo ln -sf $(which python3) /usr/local/bin/python
+        fi
+        
+        # Upgrade pip
+        python3 -m pip install --upgrade pip
