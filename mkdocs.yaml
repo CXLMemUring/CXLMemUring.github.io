@@ -1,11 +1,11 @@
-site_name: Multi-V-VM
-repo_url: https://github.com/Multi-V-VM
-site_url: https://Multi-V-VM.github.io
-repo_name: Multi-V-VM
-copyright: Copyright (c) 2024 Multi-V-VM org.
-site_description: 'Multi-V-VM: Migration based on WebAssembly'
+site_name: CXLMemUring
+repo_url: https://github.com/CXLMemUring
+site_url: https://CXLMemUring.github.io
+repo_name: CXLMemUring
+copyright: Copyright (c) 2024 CXLMemUring org.
+site_description: 'CXLMemUring: Migration based on WebAssembly'
 remote_branch: docs
-edit_uri: "https://github.com/Multi-V-VM/Multi-V-VM.github.io"
+edit_uri: "https://github.com/CXLMemUring/CXLMemUring.github.io"
 theme:
   name: material
   logo: assets/logo.png
@@ -60,7 +60,7 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/Multi-V-VM
+      link: https://github.com/CXLMemUring
     - icon: fontawesome/solid/paper-plane
       link: mailto:victoryang00@ucsc.edu
   generator: false

@@ -113,4 +113,72 @@ As the capacity demands with tolerable latency and bandwidth continue to grow, a
 
 CXLMemUring isn't just a technical solution - it's a new way of thinking about memory access in the CXL era. By combining hardware and software innovation, we can break through the memory wall and enable the next generation of high-performance applications.
 
-As the CXL ecosystem matures, innovations like CXLMemUring will become increasingly important. They not only improve system performance but also provide developers with more flexible programming models, ultimately driving the entire computing industry forward.
+As the CXL ecosystem matures, innovations like CXLMemUring will become increasingly important. They not only improve system performance but also provide developers with more flexible programming models, ultimately driving the entire computing industry forward.CXLMemUring: Breaking the Memory Wall with Asynchronous CXL Memory Access
+
+In today's computing landscape, we're facing an increasingly critical challenge - the Memory Wall. Whether it's HPC applications, Deep Learning Recommendation Models (DLRM), or Large Language Model (LLM) training, all are constrained by memory access latency and bandwidth limitations. Today, I want to introduce an innovative solution: CXLMemUring, a hardware-software co-design paradigm for asynchronous and flexible parallel CXL memory pool access.
+
+## CXL Technology: Opening New Doors for Memory Expansion
+
+CXL (Compute Express Link) is an emerging technology that expands memory for both host CPUs and device accelerators through a load/store interface. What sets CXL apart from traditional proprietary standards like NVLink is its extension of memory coherency to the PCIe root complex, making co-design more flexible. You can access memory with coherency using near-device computing capabilities.
+
+## The Core Concept of CXLMemUring
+
+CXLMemUring draws inspiration from Linux's io_uring mechanism. The core idea is to offload synthesized memory operations to CXL endpoints, CXL switches, or cores near the CXL root complex (like Intel DSA) to fetch data, while CPUs or accelerators perform other computations in the background.
+
+When CXL completes data loading:
+
+- Data is placed into L1 cache if capacity permits
+- The in-core Reorder Buffer (ROB) is notified via mailbox
+- Computation resumes on the previous hardware context
+
+## Hardware-Software Co-design Architecture
+
+### Software Stack
+
+CXLMemUring employs a binary JIT approach similar to Apple Rosetta, seamlessly executing binaries. Key features include:
+
+1. **Forward Analysis**: Translates all remotable memory accesses and pointer accesses to CXL byte-addressable access methods (using MLIR)
+2. **Backward Analysis**: Identifies all functions with remote pointers passed, which may be rewritten with native local pointers
+3. **Profiling-Guided Optimization**: All functions and labels are marked as profiling-guided points for cost model penalties in timing windows
+4. **Dynamic Optimization**: JIT can modify code after labels have been called once to achieve better timing windows
+
+### Hardware Stack
+
+Hardware modifications focus on several key areas:
+
+1. **BOOMv3-based Evaluation Platform**: BOOMv3 was chosen because it's an easily modifiable core
+2. **CHI Integration**: For simulating access to CXL switches and other accelerators
+3. **Co-processor Design**: Adding co-processors near endpoints to calculate memory requests
+4. **In-core Logic**: All memory returns go to L1 cache, avoiding interrupts and only setting ROB metadata to activate requests
+
+## Technical Innovations
+
+1. **Asynchronous Access Pattern**: Adopts an io_uring-like asynchronous memory access approach, greatly improving memory access parallelism
+2. **Dynamic Code Optimization**: Uses JIT compiler to dynamically analyze and optimize memory access patterns
+3. **Flexible Offloading Points**: Supports compute offloading at multiple locations including CXL endpoints, switches, or DSA
+4. **Fine-grained Access**: CXL supports 64-byte fine-grained access, more suitable for C++ object access than RDMA's 4KB pages
+
+## Evaluation Goals
+
+CXLMemUring's evaluation aims to answer these key questions:
+
+1. **Effectiveness of Window Size Capture**: How effectively instruction windows are offloaded
+2. **Integration with ROB and MSHR**: Exploring optimal integration design approaches
+3. **On-chip Size Comparison**: Whether this approach can save chip area
+4. **Programming Model Guidance**: Providing direction for future programming paradigms
+
+## Comparison with Existing Solutions
+
+CXLMemUring offers distinct advantages over existing solutions:
+
+- **vs Data Streaming Accelerator (DSA)**: DSA is currently designed only for single-root CPU and bulk memory loads, requiring driver code and auxiliary data transmission for communication
+- **vs Asynchronous RDMA/SmartNIC**: RDMA's 4KB granularity is too large for most C++ objects, unsuitable for pointer chasing and indirect memory reading
+- **vs "In-order-core" Asynchronous Memory Unit**: Existing solutions only evaluate on in-order cores without fully considering L2 contention, ROB, and MSHR relationships
+
+## Looking Ahead
+
+CXLMemUring represents a new direction in memory access optimization. In future co-design scenarios, CPUs will serve as hubs for combining DSA requests and executing OLAP operations they excel at, while hardware design will only need co-processors near endpoints to calculate memory requests. This design paradigm promises to provide a scalable solution to the memory wall problem.
+
+As CXL technology continues to mature and become more widespread, we believe innovative designs like CXLMemUring will play an increasingly important role in high-performance computing, AI training, and other domains, helping us break through memory bottlenecks and achieve new leaps in computational performance.
+
+The beauty of CXLMemUring lies in its recognition that memory access patterns are often not statically computable, requiring adaptive, runtime optimization. By combining hardware acceleration with intelligent software management, it offers a path forward in our ongoing battle against the memory wall - one that's both practical and scalable for the demands of modern computing workloads.

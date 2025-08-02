@@ -1,6 +1,6 @@
 ---
 template: home.html
-title: 'Multi-V-VM: Migration based on WebAssembly'
+title: 'CXLMemUring: Migration based on WebAssembly'
 hide:
   - navigation
   - toc

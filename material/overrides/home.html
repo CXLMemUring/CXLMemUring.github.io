@@ -60,7 +60,7 @@
     }
 
     .hero {
-        background: url('https://raw.githubusercontent.com/Multi-V-VM/Multi-V-VM.github.io/main/material/background.jpg') no-repeat center center;
+        background: url('https://raw.githubusercontent.com/CXLMemUring/CXLMemUring.github.io/main/material/background.jpg') no-repeat center center;
         background-size: cover;
         padding: 100px 0;
         color: #fff;
@@ -277,34 +277,34 @@
 </style>
 
 <div class="hero">
-    <h1>Welcome to Multi-V-VM lab!</h1>
+    <h1>Welcome to CXLMemUring lab!</h1>
     <p>Unlock the full potential of Wasm docker with live migration</p>
-    <a href="https://github.com/Multi-V-VM" class="github-button">View on GitHub</a>
+    <a href="https://github.com/CXLMemUring" class="github-button">View on GitHub</a>
 </div>
 
 <div class="section projects">
     <h2>Open source Projects</h2>
-    <p>Our suite of projects addresses key challenges in Wasm and WASI development, from runtime performance to ease of use.</p>
+    <p>CXLMemUring is a hardware-software co-design paradigm that enables asynchronous, io_uring-style access to CXL memory pools by offloading memory operations to near-endpoint processors while CPUs continue other computations, effectively breaking through the memory wall bottleneck.</p>
     <div class="card-container">
         <!-- Individual cards for each project -->
         <div class="card">
-            <h3>DoubleJIT-VM</h3>
+            <h3>chipyard-agilex</h3>
             <p></p>
-            <a href="https://github.com/Multi-V-VM/DoubleJIT-VM">Learn More</a>
+            <a href="https://github.com/CXLMemUring/chipyard-agilex">Learn More</a>
         </div>
         <div class="card">
-            <h3>Multi-V-VM</h3>
+            <h3>CXLMemUring</h3>
             <p></p>
-            <a href="https://github.com/Multi-V-VM/MVVM">Learn More</a>
+            <a href="https://github.com/CXLMemUring/CXLMemUring">Learn More</a>
         </div>
     </div>
 </div>
 
 <div class="section featured">
-    <h2>Use Cases</h2>
-    <p>Cursor Wasm AI IDE heterogeneous deployment</p>
-    <p>Fork your AI agent everywhere</p>
-    <p>Smartly offload your LLM application to the cloud</p>
+    <h2>Comparison with Existing Solutions</h2>
+    <p>vs Data Streaming Accelerator (DSA): DSA is currently designed only for single-root CPU and bulk memory loads, requiring driver code and auxiliary data transmission for communication</p>
+    <p>vs Asynchronous RDMA/SmartNIC: RDMA's 4KB granularity is too large for most C++ objects, unsuitable for pointer chasing and indirect memory reading</p>
+    <p>vs "In-order-core" Asynchronous Memory Unit: Existing solutions only evaluate on in-order cores without fully considering L2 contention, ROB, and MSHR relationships</p>
 </div>
 
 {% endblock %}

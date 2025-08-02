@@ -1,9 +1,9 @@
-# Multi-V-VM mainpage
+# CXLMemUring mainpage
 
-This is the source of the official [Multi-V-VM website][official website].
+This is the source of the official [CXLMemUring website][official website].
 
 
-[official website]: https://Multi-V-VM.github.io.
+[official website]: https://CXLMemUring.github.io.
 
 ## Requirements
 
