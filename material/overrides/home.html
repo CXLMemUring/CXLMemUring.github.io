@@ -1,0 +1,318 @@
+{% extends "main.html" %}
+
+<!-- Render hero under tabs -->
+{% block tabs %}
+{{ super() }}
+<style>
+    /* Styles */
+
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+        background: #f7f7f7;
+    }
+
+
+    /* Base styles for the content */
+    .section {
+        max-width: 800px;
+        margin: 0 auto 50px;
+        padding: 50px 20px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Typography enhancements for a modern look */
+    .section h2 {
+        font-size: 3em;
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 1em;
+        text-align: center;
+    }
+
+    .section p {
+        font-size: 2em;
+        color: #666;
+        margin-bottom: 2em;
+        text-align: center;
+    }
+
+    /* Link styles for a cleaner look */
+    .section a {
+        color: #004d7a;
+        text-decoration: none;
+        /* No underline for a cleaner look */
+        font-weight: 500;
+        margin-right: 15px;
+        /* Space out inline links */
+        transition: color 0.3s ease;
+    }
+
+    .section a:hover {
+        color: #002951;
+        /* Darken color on hover for interaction feedback */
+        text-decoration: underline;
+        /* Underline on hover for accessibility */
+    }
+
+    .hero {
+        background: url('https://raw.githubusercontent.com/CXLMemUring/CXLMemUring.github.io/main/material/background.jpg') no-repeat center center;
+        background-size: cover;
+        padding: 100px 0;
+        color: #fff;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
+
+    .hero h1 {
+        font-size: 4em;
+        font-weight: 700;
+        margin: 0 0 20px;
+    }
+
+    .hero p {
+        font-size: 2em;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .github-button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin-top: 20px;
+        background-color: #333; /* GitHub's dark gray */
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .github-button:hover,
+    .github-button:focus {
+    background-color: #2c2f33; /* Slightly lighter gray for hover effect */
+    color: #ffffff;
+    text-decoration: none;
+    }
+
+    .projects,
+    .learn-more,
+    .featured {
+        padding: 50px 20px;
+        text-align: center;
+    }
+
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        border-radius: 8px;
+        padding: 30px;
+        margin: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        float: left;
+        width: calc(33.333% - 40px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .card h3 {
+        color: #004d7a;
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .card p {
+        font-size: 1.25em;
+        line-height: 1.6;
+        color: #555;
+    }
+
+    .card a {
+        background: none;
+        /* 移除背景色 */
+        color: #004d7a;
+        /* 设置文字颜色 */
+        padding: 8px 16px;
+        /* 根据需要调整内边距来更改按钮大小 */
+        border: 2px solid #004d7a;
+        /* 添加边框 */
+        border-radius: 50px;
+        /* 保持圆角 */
+        transition: background-color 0.3s ease, color 0.3s ease;
+        /* 添加颜色变化的过渡效果 */
+    }
+
+    .card a:hover {
+        background-color: #004d7a;
+        /* 悬停时的背景色 */
+        color: #fff;
+        /* 悬停时的文字颜色 */
+    }
+
+    @media (max-width: 1024px) {
+        .card {
+            width: calc(50% - 40px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .card {
+            width: calc(100% - 40px);
+        }
+    }
+
+    .learn-more {
+        /* Use flexbox to align items and manage spacing */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .featured {
+        clear: both;
+        /* Clear floated elements */
+        padding-top: 20px;
+    }
+
+    .featured ul {
+        padding-left: 0;
+        list-style: none;
+        /* Remove bullet points */
+    }
+
+    .featured li {
+        padding-bottom: 10px;
+        /* Add padding below each list item */
+        margin-bottom: 10px;
+        /* Add margin below each list item */
+        border-bottom: 1px solid #eaeaea;
+        /* Add a separator */
+    }
+
+    .featured li:last-child {
+        border-bottom: none;
+        /* No border for the last item */
+    }
+
+    .section.featured a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease-in-out;
+        font-size: 18px;
+        width: 800px;
+    }
+
+    .section.featured a:hover {
+        color: #0056b3;
+    }
+
+    .section.featured span {
+        color: #6c757d;
+        display: block;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .section.featured h2 {
+            font-size: 20px;
+        }
+
+        .section.featured a {
+            font-size: 16px;
+        }
+
+        .section.featured span {
+            font-size: 14px;
+        }
+
+        .learn-more a {
+            padding: 10px 15px;
+            /* Reduce padding on mobile */
+            margin: 10px 5px;
+            /* Reduce margin on mobile */
+            min-width: auto;
+            /* Allow buttons to shrink on small screens */
+            font-size: 14px;
+            /* Reduce font size on mobile */
+        }
+
+        .featured li {
+            padding-bottom: 15px;
+            /* Increase padding for touch targets on mobile */
+        }
+
+    }
+
+    .footer {
+        background: #333;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+</style>
+
+<div class="hero">
+    <h1>Welcome to CXLMemUring lab!</h1>
+    <p>Unlock the full potential of Wasm docker with live migration</p>
+    <a href="https://github.com/CXLMemUring" class="github-button">View on GitHub</a>
+</div>
+
+<div class="section projects">
+    <h2>Open source Projects</h2>
+    <p>CXLMemUring is a hardware-software co-design paradigm that enables asynchronous, io_uring-style access to CXL memory pools by offloading memory operations to near-endpoint processors while CPUs continue other computations, effectively breaking through the memory wall bottleneck.</p>
+    <div class="card-container">
+        <!-- Individual cards for each project -->
+        <div class="card">
+            <h3>chipyard-agilex</h3>
+            <p></p>
+            <a href="https://github.com/CXLMemUring/chipyard-agilex">Learn More</a>
+        </div>
+        <div class="card">
+            <h3>CXLMemUring</h3>
+            <p></p>
+            <a href="https://github.com/CXLMemUring/CXLMemUring">Learn More</a>
+        </div>
+    </div>
+</div>
+
+<div class="section featured">
+    <h2>Comparison with Existing Solutions</h2>
+    <p>vs Data Streaming Accelerator (DSA): DSA is currently designed only for single-root CPU and bulk memory loads, requiring driver code and auxiliary data transmission for communication</p>
+    <p>vs Asynchronous RDMA/SmartNIC: RDMA's 4KB granularity is too large for most C++ objects, unsuitable for pointer chasing and indirect memory reading</p>
+    <p>vs "In-order-core" Asynchronous Memory Unit: Existing solutions only evaluate on in-order cores without fully considering L2 contention, ROB, and MSHR relationships</p>
+</div>
+
+{% endblock %}
+
+<!-- Content -->
+{% block content %}{% endblock %}
+
+<!-- Application footer -->
+{% block footer %}
+{{ super() }}
+{% endblock %}

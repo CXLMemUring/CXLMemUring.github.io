@@ -1,0 +1,70 @@
+site_name: CXLMemUring
+repo_url: https://github.com/CXLMemUring
+site_url: https://CXLMemUring.github.io
+repo_name: CXLMemUring
+copyright: Copyright (c) 2024 CXLMemUring org.
+site_description: 'CXLMemUring: Migration based on WebAssembly'
+remote_branch: docs
+edit_uri: "https://github.com/CXLMemUring/CXLMemUring.github.io"
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  custom_dir: material/overrides
+  palette:
+    - scheme: default
+      primary: white
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.expand
+    - navigation.sections
+    - header.autohide
+nav:
+  - Home:
+      - index.md
+
+  - Architecture:
+    - architecture/index.md
+
+markdown_extensions:
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - def_list
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/CXLMemUring
+    - icon: fontawesome/solid/paper-plane
+      link: mailto:victoryang00@ucsc.edu
+  generator: false
+plugins:
+  - social
+  - search
+  - tags
